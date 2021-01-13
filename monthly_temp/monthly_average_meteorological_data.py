@@ -4,6 +4,7 @@ import numpy as np
 import requests
 import zipfile
 from pathlib import Path
+from unidecode import unidecode
 
 
 def unzip(f, encoding, v):
@@ -36,12 +37,14 @@ class MonthlyAverageMeteorologicalData:
         result = pd.DataFrame()
         for i in postfixes:
             d = pd.read_csv(f'k_m_t_{i}.csv', header=None, usecols=[0, 1, 2, 3, 4, 8], names=header_list, sep=',',
-                            engine='python', encoding='unicode_escape')
+                            engine='python')
             result = result.append(d)
         self.df = result
         self.df['DATE_TIME'] = self.df['YEAR'].map(str) + '-' + self.df['MONTH'].map(str)
         self.df['DATE_TIME'] = pd.to_datetime(self.df['DATE_TIME']).dt.strftime('%Y-%m')
         del self.df['MONTH']
+
+
 
     def _change_index(self):
         return self.df.set_index(['STATION_ID', 'DATE_TIME'])
